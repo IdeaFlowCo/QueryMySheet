@@ -19,11 +19,71 @@ export default function Home() {
   const [results, setResults] = useState<QueryResult[]>([]);
   const [originalResults, setOriginalResults] = useState<QueryResult[]>([]);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   // Handle file change
   const handleFileChange = (selectedFile: File) => {
     setFile(selectedFile);
     setFileName(selectedFile.name);
+    // Auto-switch to upload tab when a file is directly dropped onto the page
+    setActiveTab('upload');
+  };
+  
+  // Global drag and drop handlers
+  const handleGlobalDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Check if files are being dragged
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDraggingFile(true);
+    }
+  };
+  
+  const handleGlobalDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDraggingFile(true);
+    }
+  };
+  
+  const handleGlobalDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Only set dragging to false if we're leaving the document
+    if (e.clientY <= 0 || e.clientX <= 0 || 
+        e.clientX >= window.innerWidth || 
+        e.clientY >= window.innerHeight) {
+      setIsDraggingFile(false);
+    }
+  };
+  
+  const handleGlobalDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+    
+    // Check if files are being dropped
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const droppedFile = e.dataTransfer.files[0];
+      
+      // Check if it's a supported file type
+      const supportedTypes = ['.csv', '.xlsx', '.xls', '.ods', '.numbers', '.gsheet'];
+      const fileExtension = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
+      
+      if (supportedTypes.some(ext => fileExtension.includes(ext))) {
+        handleFileChange(droppedFile);
+      } else {
+        toast({
+          title: "Unsupported File Type",
+          description: "Please upload a CSV or spreadsheet file.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   // Mutation for processing the query
@@ -145,7 +205,38 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div 
+      className="container mx-auto px-4 py-8 max-w-6xl relative"
+      onDragEnter={handleGlobalDragEnter}
+      onDragOver={handleGlobalDragOver}
+      onDragLeave={handleGlobalDragLeave}
+      onDrop={handleGlobalDrop}
+    >
+      {/* File drop overlay */}
+      {isDraggingFile && (
+        <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center rounded-lg z-50 border-2 border-dashed border-primary animate-in fade-in duration-300">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center animate-pulse">
+            <div className="w-16 h-16 mx-auto mb-4 text-primary">
+              <svg 
+                className="w-16 h-16" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Drop your spreadsheet file</h3>
+            <p className="text-gray-500">Release to upload your CSV or Excel file</p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-center mb-8">
         <div className="flex items-center mb-4 md:mb-0">
