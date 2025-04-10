@@ -166,7 +166,7 @@ export default function Home() {
           Query your spreadsheets using natural language
         </h2>
         <p className="text-gray-500 max-w-2xl mx-auto">
-          Powered by OpenAI, this tool lets you ask questions about your data in plain English and get instant results.
+          This tool lets you ask questions about your data in plain English and get instant results.
         </p>
       </div>
 
