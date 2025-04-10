@@ -15,7 +15,7 @@ interface AnalyzeSpreadsheetParams {
 export async function analyzeSpreadsheet({
   query,
   content,
-  model = "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+  model = "gpt-4o-mini", // Using gpt-4o-mini as requested
   temperature = 0.3,
   apiKey,
 }: AnalyzeSpreadsheetParams) {

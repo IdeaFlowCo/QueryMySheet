@@ -19,14 +19,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoint for processing queries
   app.post('/api/query', upload.single('file'), async (req: Request, res: Response) => {
     try {
-      const { query, sheetUrl, apiKey, model, temperature } = req.body;
+      const { query, sheetUrl, model, temperature } = req.body;
+      // Use the environment variable for API key
+      const apiKey = process.env.OPENAI_API_KEY;
 
       if (!query) {
         return res.status(400).json({ message: "Query is required" });
       }
 
       if (!apiKey) {
-        return res.status(400).json({ message: "OpenAI API key is required" });
+        return res.status(500).json({ message: "Server configuration error: Missing API key" });
       }
 
       let spreadsheetContent: string;
@@ -46,7 +48,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const analysisResult = await analyzeSpreadsheet({
         query,
         content: spreadsheetContent,
-        model: model || "gpt-4o",
+        model: model || "gpt-4o-mini", // Default to gpt-4o-mini as requested
         temperature: parseFloat(temperature || "0.3"),
         apiKey
       });

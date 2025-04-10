@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import QuerySection from "@/components/QuerySection";
 import ResultsSection from "@/components/ResultsSection";
-import ApiKeySection from "@/components/ApiKeySection";
 import { QueryResult } from "@shared/schema";
 import { InfoIcon, FileTextIcon, FileCode } from "lucide-react";
 
@@ -17,27 +16,9 @@ export default function Home() {
   const [sheetUrl, setSheetUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
-  const [model, setModel] = useState(localStorage.getItem('openai_model') || 'gpt-3.5-turbo');
-  const [temperature, setTemperature] = useState(
-    parseFloat(localStorage.getItem('openai_temperature') || '0.3')
-  );
   const [results, setResults] = useState<QueryResult[]>([]);
   const [originalResults, setOriginalResults] = useState<QueryResult[]>([]);
   const [isFiltered, setIsFiltered] = useState(false);
-  
-  // Save API settings to localStorage
-  useEffect(() => {
-    localStorage.setItem('openai_api_key', apiKey);
-  }, [apiKey]);
-  
-  useEffect(() => {
-    localStorage.setItem('openai_model', model);
-  }, [model]);
-  
-  useEffect(() => {
-    localStorage.setItem('openai_temperature', temperature.toString());
-  }, [temperature]);
 
   // Handle file change
   const handleFileChange = (selectedFile: File) => {
@@ -48,7 +29,7 @@ export default function Home() {
   // Mutation for processing the query
   const processQueryMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      const response = await apiRequest('POST', '/api/query', undefined, formData);
+      const response = await apiRequest('POST', '/api/query', formData);
       return response.json();
     },
     onSuccess: (data) => {
@@ -76,15 +57,6 @@ export default function Home() {
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please enter your OpenAI API key in the settings below.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!query) {
       toast({
         title: "Query Required",
@@ -114,9 +86,9 @@ export default function Home() {
 
     const formData = new FormData();
     formData.append('query', query);
-    formData.append('apiKey', apiKey);
-    formData.append('model', model);
-    formData.append('temperature', temperature.toString());
+    // Hardcoded values instead of user inputs
+    formData.append('model', 'gpt-4o-mini');
+    formData.append('temperature', '0.3');
     
     if (activeTab === 'url') {
       formData.append('sheetUrl', sheetUrl);
@@ -223,16 +195,6 @@ export default function Home() {
           onExport={handleExport}
         />
       )}
-
-      {/* API Key Section */}
-      <ApiKeySection
-        apiKey={apiKey}
-        model={model}
-        temperature={temperature}
-        onApiKeyChange={setApiKey}
-        onModelChange={setModel}
-        onTemperatureChange={setTemperature}
-      />
 
       {/* Footer */}
       <footer className="text-center text-gray-500 text-sm">
