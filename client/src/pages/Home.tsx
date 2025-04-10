@@ -5,7 +5,28 @@ import { useToast } from "@/hooks/use-toast";
 import QuerySection from "@/components/QuerySection";
 import ResultsSection from "@/components/ResultsSection";
 import { QueryResult } from "@shared/schema";
-import { InfoIcon, FileTextIcon, FileCode } from "lucide-react";
+import { 
+  InfoIcon, 
+  FileTextIcon, 
+  FileCode, 
+  HelpCircleIcon,
+  TableIcon,
+  FileSpreadsheetIcon,
+  BracesIcon,
+  LinkIcon,
+  UploadIcon,
+  SearchIcon
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const { toast } = useToast();
@@ -244,10 +265,77 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-gray-900">QueryMySheet</h1>
         </div>
         <div className="flex space-x-4">
-          <a href="#" className="text-primary hover:text-primary-dark text-sm flex items-center">
-            <InfoIcon className="w-4 h-4 mr-1" />
-            How it works
-          </a>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="text-primary hover:text-primary-dark text-sm flex items-center">
+                <HelpCircleIcon className="w-4 h-4 mr-1" />
+                How it works
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="flex items-center text-xl">
+                  <InfoIcon className="w-5 h-5 mr-2 text-primary" />
+                  How QueryMySheet Works
+                </DialogTitle>
+                <DialogDescription className="text-base text-gray-600">
+                  A simple way to get answers from your spreadsheets.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-6 py-4">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <FileSpreadsheetIcon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-lg">1. Provide Your Data</h3>
+                    <p className="text-gray-600">Either paste a Google Sheet URL or upload a CSV/Excel file. You can drag and drop files anywhere on the page.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <SearchIcon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-lg">2. Ask a Question</h3>
+                    <p className="text-gray-600">Ask any question about your data in plain English. For example: "Find all employees in the Marketing department" or "What were the top 3 sales in Q2?"</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <TableIcon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-lg">3. Get Results</h3>
+                    <p className="text-gray-600">We'll analyze your data and show you the matching rows in an easy-to-read table. You can export the results to CSV.</p>
+                  </div>
+                </div>
+                
+                <div className="mt-8 bg-gray-50 p-4 rounded-md border border-gray-200">
+                  <h4 className="font-medium text-sm flex items-center mb-2">
+                    <BracesIcon className="w-4 h-4 mr-1 text-gray-500" />
+                    Pro Tips
+                  </h4>
+                  <ul className="text-sm space-y-2 text-gray-600">
+                    <li>• Press Cmd+Enter (or Ctrl+Enter) to quickly submit your query</li>
+                    <li>• Be specific in your questions to get more accurate results</li>
+                    <li>• You can drag and drop files directly onto the page</li>
+                    <li>• QueryMySheet works with data in any language</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <DialogClose asChild>
+                  <Button>Got it</Button>
+                </DialogClose>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <a 
             href="https://github.com/yourusername/querymysheet" 
             target="_blank" 

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuerySectionProps } from "../types";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, Link, Upload, LinkIcon, UploadIcon } from "lucide-react";
 
 export default function QuerySection({
   query,
@@ -86,8 +86,14 @@ export default function QuerySection({
         className="w-full"
       >
         <TabsList className="mb-4">
-          <TabsTrigger value="url">Google Sheet URL</TabsTrigger>
-          <TabsTrigger value="upload">Upload File</TabsTrigger>
+          <TabsTrigger value="url" className="flex items-center">
+            <LinkIcon className="w-4 h-4 mr-2" />
+            Google Sheet URL
+          </TabsTrigger>
+          <TabsTrigger value="upload" className="flex items-center">
+            <UploadIcon className="w-4 h-4 mr-2" />
+            Upload File
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="url" className="space-y-4">
