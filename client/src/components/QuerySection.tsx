@@ -141,7 +141,7 @@ export default function QuerySection({
                 }
                 Go
                 <span className="hidden md:inline-block absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Press Cmd+Enter
+                  Press {shortcutKey}
                 </span>
               </Button>
             </div>
@@ -233,7 +233,7 @@ export default function QuerySection({
                 }
                 Go
                 <span className="hidden md:inline-block absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Press Cmd+Enter
+                  Press {shortcutKey}
                 </span>
               </Button>
             </div>
