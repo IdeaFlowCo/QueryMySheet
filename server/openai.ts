@@ -31,6 +31,13 @@ ${content}
 
 The user's query is: "${query}"
 
+SEARCH GUIDELINES:
+1. Be thorough in your search - look for both exact matches and relevant semantic matches
+2. Recognize common abbreviations in the user's query based on the context and domain of the data
+3. Consider partial matches when appropriate (e.g., if searching for "revenue" match entries with "quarterly revenue")
+4. When analyzing text fields, look for conceptual matches, not just literal text matches
+5. Infer the user's intent from their query, don't just search for the exact words
+
 Analyze the spreadsheet and identify the rows that best match the query. For each matching row:
 1. Determine why it matches the query
 2. Extract the relevant columns and their values
@@ -47,7 +54,7 @@ Return your results in the following JSON format:
         ...
       },
       "highlighted": true,
-      "matchReason": "A brief explanation of why this row matches the query"
+      "matchReason": "A clear explanation of why this row matches the query"
     }
   ],
   "explanation": "Brief explanation of your analysis approach"
@@ -72,8 +79,8 @@ Return at most 10 most relevant results.
     }
     
     return JSON.parse(content);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error calling OpenAI API:", error);
-    throw new Error(`Failed to analyze spreadsheet: ${error.message}`);
+    throw new Error(`Failed to analyze spreadsheet: ${error.message || 'Unknown error'}`);
   }
 }

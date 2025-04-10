@@ -7,6 +7,25 @@ import { fetchGoogleSheet, parseUploadedFile } from "./sheets";
 import { openAiResponseSchema } from "@shared/schema";
 import { ZodError } from "zod";
 
+// Add type declaration for Express.Multer.File
+declare global {
+  namespace Express {
+    namespace Multer {
+      interface File {
+        fieldname: string;
+        originalname: string;
+        encoding: string;
+        mimetype: string;
+        size: number;
+        destination: string;
+        filename: string;
+        path: string;
+        buffer: Buffer;
+      }
+    }
+  }
+}
+
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -58,7 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send results back to client
       return res.status(200).json(validatedResult);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing query:", error);
 
       if (error instanceof ZodError) {
