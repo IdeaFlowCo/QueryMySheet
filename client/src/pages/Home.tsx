@@ -57,46 +57,55 @@ export default function Home() {
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (!query) {
+    try {
+      if (!query) {
+        toast({
+          title: "Query Required",
+          description: "Please enter what you're looking for.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (activeTab === 'url' && !sheetUrl) {
+        toast({
+          title: "Google Sheet URL Required",
+          description: "Please enter a valid Google Sheet URL.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (activeTab === 'upload' && !file) {
+        toast({
+          title: "File Required",
+          description: "Please upload a spreadsheet file.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('query', query);
+      // Hardcoded values instead of user inputs
+      formData.append('model', 'gpt-4o-mini');
+      formData.append('temperature', '0.3');
+      
+      if (activeTab === 'url') {
+        formData.append('sheetUrl', sheetUrl);
+      } else if (file) {
+        formData.append('file', file);
+      }
+
+      processQueryMutation.mutate(formData);
+    } catch (error) {
+      console.error("Error submitting query:", error);
       toast({
-        title: "Query Required",
-        description: "Please enter what you're looking for.",
+        title: "Error",
+        description: "An error occurred while processing your request.",
         variant: "destructive",
       });
-      return;
     }
-
-    if (activeTab === 'url' && !sheetUrl) {
-      toast({
-        title: "Google Sheet URL Required",
-        description: "Please enter a valid Google Sheet URL.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (activeTab === 'upload' && !file) {
-      toast({
-        title: "File Required",
-        description: "Please upload a spreadsheet file.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('query', query);
-    // Hardcoded values instead of user inputs
-    formData.append('model', 'gpt-4o-mini');
-    formData.append('temperature', '0.3');
-    
-    if (activeTab === 'url') {
-      formData.append('sheetUrl', sheetUrl);
-    } else if (file) {
-      formData.append('file', file);
-    }
-
-    processQueryMutation.mutate(formData);
   };
 
   // Handle clear filter
