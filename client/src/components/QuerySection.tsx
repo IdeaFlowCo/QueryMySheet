@@ -1,10 +1,10 @@
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, ChangeEvent, useCallback, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuerySectionProps } from "../types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 
 export default function QuerySection({
   query,
@@ -20,10 +20,32 @@ export default function QuerySection({
   onSubmit,
 }: QuerySectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryInputRef = useRef<HTMLInputElement>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const queryUploadInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle cmd/ctrl+enter to submit
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      // Check if form is valid before submitting
+      const canSubmit = activeTab === 'url' 
+        ? (query && sheetUrl && !isLoading)
+        : (query && file && !isLoading);
+      
+      if (canSubmit) {
+        onSubmit();
+      }
+    }
+  }, [activeTab, query, sheetUrl, file, isLoading, onSubmit]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       onFileChange(e.target.files[0]);
+      
+      // Auto-focus the query input after selecting a file for better workflow
+      if (queryUploadInputRef.current && !query) {
+        queryUploadInputRef.current.focus();
+      }
     }
   };
 
@@ -31,15 +53,33 @@ export default function QuerySection({
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       onFileChange(e.dataTransfer.files[0]);
+      
+      // Auto-focus the query input after dropping a file
+      if (queryUploadInputRef.current && !query) {
+        queryUploadInputRef.current.focus();
+      }
     }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
+  
+  // Auto trim whitespace from inputs
+  const handleQueryChange = (value: string) => {
+    onQueryChange(value.trimStart());
+  };
+  
+  const handleUrlChange = (value: string) => {
+    onSheetUrlChange(value.trim());
+  };
 
+  // Detect operating system for keyboard shortcut display
+  const isMac = typeof navigator !== 'undefined' ? navigator.platform.toUpperCase().indexOf('MAC') >= 0 : false;
+  const shortcutKey = isMac ? 'Cmd+Enter' : 'Ctrl+Enter';
+  
   return (
-    <div className="mb-8 bg-white rounded-lg shadow-sm p-6">
+    <div className="mb-8 bg-white rounded-lg shadow-sm p-6 transition-all duration-200 hover:shadow-md">
       <Tabs 
         value={activeTab} 
         onValueChange={(value) => onTabChange(value as 'url' | 'upload')}
@@ -58,10 +98,13 @@ export default function QuerySection({
               </Label>
               <Input
                 id="query"
+                ref={queryInputRef}
                 value={query}
-                onChange={(e) => onQueryChange(e.target.value)}
-                placeholder="Looking for full stack engineer"
+                onChange={(e) => handleQueryChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="e.g., employees hired after 2020"
                 className="py-3"
+                autoFocus
               />
             </div>
             
@@ -71,9 +114,11 @@ export default function QuerySection({
               </Label>
               <Input
                 id="sheet-url"
+                ref={urlInputRef}
                 value={sheetUrl}
-                onChange={(e) => onSheetUrlChange(e.target.value)}
-                placeholder="https://sheets.google.com/..."
+                onChange={(e) => handleUrlChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="https://docs.google.com/spreadsheets/d/..."
                 className="py-3"
               />
             </div>
@@ -82,10 +127,16 @@ export default function QuerySection({
               <Button 
                 onClick={onSubmit}
                 disabled={isLoading || !query || !sheetUrl}
-                className="h-12 px-6"
+                className="h-12 px-6 relative group"
               >
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {isLoading ? 
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
+                  <Search className="mr-2 h-4 w-4" />
+                }
                 Go
+                <span className="hidden md:inline-block absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Press Cmd+Enter
+                </span>
               </Button>
             </div>
           </div>
@@ -99,9 +150,11 @@ export default function QuerySection({
               </Label>
               <Input
                 id="query-upload"
+                ref={queryUploadInputRef}
                 value={query}
-                onChange={(e) => onQueryChange(e.target.value)}
-                placeholder="Looking for full stack engineer"
+                onChange={(e) => handleQueryChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="e.g., sales numbers for Q1 2023"
                 className="py-3"
               />
             </div>
@@ -166,10 +219,16 @@ export default function QuerySection({
               <Button 
                 onClick={onSubmit}
                 disabled={isLoading || !query || !file}
-                className="h-12 px-6"
+                className="h-12 px-6 relative group"
               >
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {isLoading ? 
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
+                  <Search className="mr-2 h-4 w-4" />
+                }
                 Go
+                <span className="hidden md:inline-block absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Press Cmd+Enter
+                </span>
               </Button>
             </div>
           </div>
