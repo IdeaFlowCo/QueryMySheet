@@ -35,10 +35,6 @@
             "status": 204
         },
         {
-            "src": "/api/(.*)",
-            "dest": "/dist/api/$1"
-        },
-        {
             "src": "/(.*\\.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))$",
             "headers": {
                 "Cache-Control": "public, max-age=31536000, immutable"
