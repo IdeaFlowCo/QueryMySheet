@@ -1,5 +1,22 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// Determine the base URL for API requests
+const getApiBaseUrl = () => {
+  // Use window.location in browser environments
+  if (typeof window !== 'undefined') {
+    // Local development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return '';
+    }
+    
+    // Vercel deployment
+    return window.location.origin;
+  }
+  
+  // Default for server-side rendering
+  return '';
+};
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -14,7 +31,10 @@ export async function apiRequest(
 ): Promise<Response> {
   const isFormData = data instanceof FormData;
   
-  const res = await fetch(url, {
+  // Create full URL if needed
+  const fullUrl = url.startsWith('http') ? url : `${getApiBaseUrl()}${url}`;
+  
+  const res = await fetch(fullUrl, {
     method,
     headers: isFormData ? {} : (data ? { "Content-Type": "application/json" } : {}),
     body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
@@ -31,7 +51,11 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Use the base URL detection to properly format the endpoint URL
+    const url = queryKey[0] as string;
+    const fullUrl = url.startsWith('http') ? url : `${getApiBaseUrl()}${url}`;
+    
+    const res = await fetch(fullUrl, {
       credentials: "include",
     });
 

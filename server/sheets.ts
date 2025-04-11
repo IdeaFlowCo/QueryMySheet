@@ -4,13 +4,13 @@ import fetch from 'node-fetch';
 
 // Parse CSV string to JSON
 export function parseCSV(csvString: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<any[]>((resolve, reject) => {
     Papa.parse(csvString, {
       header: true,
-      complete: (results) => {
+      complete: (results: Papa.ParseResult<any>) => {
         resolve(results.data);
       },
-      error: (error) => {
+      error: (error: Error) => {
         reject(error);
       }
     });
