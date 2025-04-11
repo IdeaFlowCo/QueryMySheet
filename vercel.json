@@ -14,27 +14,6 @@
             }
         }
     ],
-    "routes": [
-        {
-            "src": "/api/health",
-            "dest": "/api/health.ts"
-        },
-        {
-            "src": "/api/query",
-            "dest": "/api/query.ts"
-        },
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/$1.ts"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/index.html"
-        }
-    ],
     "rewrites": [
         {
             "source": "/(.*)",
