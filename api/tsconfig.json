@@ -1,9 +1,7 @@
 {
-    "extends": "../tsconfig.json",
     "compilerOptions": {
-        "noEmit": false,
-        "module": "CommonJS",
         "target": "ES2016",
+        "module": "CommonJS",
         "lib": ["ES2016"],
         "types": ["node"],
         "outDir": "../dist/api",
