@@ -1,15 +1,21 @@
 {
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node",
-    "typeRoots": ["../node_modules/@types"]
-  },
-  "include": ["./**/*.ts"],
-  "exclude": ["node_modules"]
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "noEmit": false,
+        "module": "CommonJS",
+        "target": "ES2016",
+        "lib": ["ES2016"],
+        "types": ["node"],
+        "outDir": "../dist/api",
+        "rootDir": ".",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "resolveJsonModule": true
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["node_modules", "**/*.test.ts"]
 }
