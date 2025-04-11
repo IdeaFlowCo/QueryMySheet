@@ -1,67 +1,25 @@
 #!/bin/bash
 
-# Exit on error
-set -e
+# Log colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-echo "Running Vercel build script..."
+echo -e "${GREEN}Starting Vercel build process...${NC}"
 
-# Build the client and server as configured in package.json
-npm run build
+# Install any missing types
+echo -e "${YELLOW}Installing types...${NC}"
+npm install --save-dev @types/papaparse @types/multer
 
-# Create a vercel specific output folder
-mkdir -p .vercel/output/static
-mkdir -p .vercel/output/functions/api
+# Build the client
+echo -e "${YELLOW}Building client...${NC}"
+cd client && npm run build
+BUILD_STATUS=$?
 
-# Copy static files from client build
-cp -r client/dist/* .vercel/output/static/
+if [ $BUILD_STATUS -ne 0 ]; then
+  echo -e "${RED}Client build failed with status $BUILD_STATUS${NC}"
+  exit $BUILD_STATUS
+fi
 
-# Create Vercel config for routing
-cat > .vercel/output/config.json << EOF
-{
-  "version": 3,
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
-}
-EOF
-
-# Create the API function
-cat > .vercel/output/functions/api.func/index.js << EOF
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import express from 'express';
-import bodyParser from 'body-parser';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import path from 'path';
-
-// Import your server code
-import { handler } from '../../dist/server/index.js';
-
-export default function (req, res) {
-  return handler(req, res);
-}
-EOF
-
-# Create the API function package.json
-cat > .vercel/output/functions/api.func/package.json << EOF
-{
-  "name": "api-function",
-  "type": "module",
-  "dependencies": {
-    "express": "^4.18.2"
-  }
-}
-EOF
-
-echo "Vercel build complete!"
+echo -e "${GREEN}Build completed successfully!${NC}"
