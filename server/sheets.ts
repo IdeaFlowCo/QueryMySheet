@@ -26,7 +26,7 @@ export function convertToCSV(data: any[]) {
 export async function fetchGoogleSheet(url: string): Promise<string> {
   try {
     // Extract the sheet ID from the URL
-    let sheetId;
+    let sheetId: string | null = null;
     
     if (url.includes('/spreadsheets/d/')) {
       // Format: https://docs.google.com/spreadsheets/d/SHEET_ID/...
@@ -58,7 +58,7 @@ export async function fetchGoogleSheet(url: string): Promise<string> {
     return await response.text();
   } catch (error) {
     console.error('Error fetching Google Sheet:', error);
-    throw new Error(`Failed to fetch Google Sheet: ${error.message}`);
+    throw new Error(`Failed to fetch Google Sheet: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -66,7 +66,7 @@ export async function fetchGoogleSheet(url: string): Promise<string> {
 export async function parseUploadedFile(file: Express.Multer.File): Promise<string> {
   try {
     const fileData = file.buffer;
-    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
+    const fileExtension = file.originalname.split('.').pop()?.toLowerCase() || '';
     
     if (fileExtension === 'csv') {
       // Parse CSV file
@@ -83,6 +83,6 @@ export async function parseUploadedFile(file: Express.Multer.File): Promise<stri
     }
   } catch (error) {
     console.error('Error parsing uploaded file:', error);
-    throw new Error(`Failed to parse file: ${error.message}`);
+    throw new Error(`Failed to parse file: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
