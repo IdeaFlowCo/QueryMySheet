@@ -1,0 +1,111 @@
+/* DataTable specific styles */
+.table-container {
+    height: 65vh; /* Maintain height */
+    overflow: auto; /* Keep scrolling */
+    border: 1px solid #dee2e6; /* Match other borders */
+    border-radius: 6px; /* Add slight rounding */
+    background-color: #ffffff; /* Ensure white background */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Important for virtualized column widths */
+}
+
+.table-header {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa; /* Header background */
+    z-index: 1;
+    border-bottom: 2px solid #dee2e6; /* Header bottom border */
+}
+
+.table-header-cell {
+    /* width is set inline */
+    border-bottom: 1px solid #dee2e6;
+    padding: 10px 12px; /* Adjusted padding */
+    text-align: left;
+    font-weight: 600; /* Slightly bolder header */
+    color: #495057;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-right: 1px solid #dee2e6;
+}
+
+.table-header-cell:last-child {
+    border-right: none;
+}
+
+.table-body {
+    position: relative; /* Needed for absolute positioned rows */
+}
+
+.table-row {
+    position: absolute; /* Needed for virtualization */
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* height and transform are set inline */
+    display: flex; /* Use flex for row cells */
+}
+
+.table-row.even {
+    background-color: #ffffff;
+}
+
+.table-row.odd {
+    background-color: #f8f9fa; /* Alternating row color */
+}
+
+.table-cell {
+    /* width is set inline */
+    padding: 9px 12px; /* Adjusted padding */
+    border-right: 1px solid #e9ecef; /* Lighter cell border */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex; /* Align content vertically if needed */
+    align-items: center;
+    font-size: 0.9rem; /* Slightly smaller cell font */
+}
+
+.table-cell:last-child {
+    border-right: none;
+}
+
+/* Loading and Message Indicators */
+.loading-indicator,
+.message-indicator {
+    padding: 3rem 1rem;
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-top: 1rem;
+}
+
+.spinner {
+    border: 4px solid #e9ecef; /* Lighter spinner border */
+    border-top: 4px solid #0d6efd; /* Primary spinner color */
+    border-radius: 50%;
+    width: 24px; /* Slightly smaller spinner */
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Ensure spin keyframes are available (can be here or in App.css) */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

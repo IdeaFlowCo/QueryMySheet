@@ -3,7 +3,7 @@ import debounce from "lodash.debounce";
 import { useData } from "../context/DataContext";
 
 const SearchFilter = () => {
-    const { runSearchQuery } = useData();
+    const { runSearchQuery, loading } = useData();
 
     const debouncedSearch = useCallback(
         debounce((q: string) => {
@@ -17,12 +17,17 @@ const SearchFilter = () => {
     };
 
     return (
-        <div style={{ marginBottom: "1rem" }}>
+        <div
+            className="search-filter-container"
+            style={{ marginBottom: "1.5rem" }}
+        >
+            <label htmlFor="search-input">What are you looking for?</label>
             <input
+                id="search-input"
                 type="text"
-                placeholder="What are you looking for?"
+                placeholder="e.g., employees hired after 2020"
                 onChange={handleChange}
-                style={{ width: "100%", padding: "0.5rem" }}
+                disabled={loading}
             />
         </div>
     );

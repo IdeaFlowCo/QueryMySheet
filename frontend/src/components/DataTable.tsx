@@ -7,9 +7,10 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useData } from "../context/DataContext";
+import "./DataTable.css";
 
 const DataTable: React.FC = () => {
-    const { headers, filteredRows } = useData();
+    const { headers, filteredRows, loading } = useData();
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const columns = useMemo<ColumnDef<string[]>[]>(() => {
@@ -17,7 +18,7 @@ const DataTable: React.FC = () => {
             id: String(index),
             header: header,
             accessorFn: (row) => row[index],
-            size: 150,
+            size: 160,
         }));
     }, [headers]);
 
@@ -31,42 +32,49 @@ const DataTable: React.FC = () => {
 
     const rowVirtualizer = useVirtualizer({
         count: rows.length,
-        estimateSize: () => 35,
+        estimateSize: () => 40,
         getScrollElement: () => tableContainerRef.current,
         overscan: 5,
     });
 
     const virtualRows = rowVirtualizer.getVirtualItems();
 
+    if (loading) {
+        return (
+            <div className="loading-indicator">
+                <div className="spinner"></div>
+                finding results...
+            </div>
+        );
+    }
+
+    if (!loading && filteredRows.length === 0 && headers.length > 0) {
+        return (
+            <div className="message-indicator">
+                No results found for your query.
+            </div>
+        );
+    }
+
+    if (headers.length === 0) {
+        return (
+            <div className="message-indicator">
+                Load data using the options above.
+            </div>
+        );
+    }
+
     return (
-        <div
-            ref={tableContainerRef}
-            style={{ height: "70vh", overflow: "auto" }}
-        >
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead
-                    style={{
-                        position: "sticky",
-                        top: 0,
-                        background: "white",
-                        zIndex: 1,
-                    }}
-                >
+        <div ref={tableContainerRef} className="table-container">
+            <table className="data-table">
+                <thead className="table-header">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <tr key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
                                 <th
                                     key={header.id}
-                                    style={{
-                                        width: header.getSize(),
-                                        borderBottom: "1px solid #ddd",
-                                        borderRight: "1px solid #ddd",
-                                        padding: "8px",
-                                        textAlign: "left",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                        whiteSpace: "nowrap",
-                                    }}
+                                    style={{ width: header.getSize() }}
+                                    className="table-header-cell"
                                 >
                                     {flexRender(
                                         header.column.columnDef.header,
@@ -78,37 +86,27 @@ const DataTable: React.FC = () => {
                     ))}
                 </thead>
                 <tbody
-                    style={{
-                        height: `${rowVirtualizer.getTotalSize()}px`,
-                        position: "relative",
-                    }}
+                    className="table-body"
+                    style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
                 >
                     {virtualRows.map((virtualRow) => {
                         const row = rows[virtualRow.index];
                         return (
                             <tr
                                 key={row.id}
+                                className={`table-row ${
+                                    virtualRow.index % 2 ? "odd" : "even"
+                                }`}
                                 style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
                                     height: `${virtualRow.size}px`,
                                     transform: `translateY(${virtualRow.start}px)`,
-                                    borderBottom: "1px solid #eee",
                                 }}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <td
                                         key={cell.id}
-                                        style={{
-                                            width: cell.column.getSize(),
-                                            padding: "8px",
-                                            borderRight: "1px solid #ddd",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                        }}
+                                        style={{ width: cell.column.getSize() }}
+                                        className="table-cell"
                                     >
                                         {flexRender(
                                             cell.column.columnDef.cell,
