@@ -53,25 +53,15 @@ function QuerySection({
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
                 const canSubmit =
                     activeTab === "url"
-                        ? query &&
-                          sheetUrl &&
-                          (!isLoading || isLoadingSpreadsheet)
-                        : query && file && (!isLoading || isLoadingSpreadsheet);
+                        ? sheetUrl && (!isLoading || isLoadingSpreadsheet)
+                        : file && (!isLoading || isLoadingSpreadsheet);
 
                 if (canSubmit) {
                     onSubmit();
                 }
             }
         },
-        [
-            activeTab,
-            query,
-            sheetUrl,
-            file,
-            isLoading,
-            isLoadingSpreadsheet,
-            onSubmit,
-        ]
+        [activeTab, sheetUrl, file, isLoading, isLoadingSpreadsheet, onSubmit]
     );
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +123,6 @@ function QuerySection({
     // Determine if the submit button should be disabled (restored from revert)
     const isSubmitDisabled =
         (isLoading && !isLoadingSpreadsheet) ||
-        !query ||
         (activeTab === "url" && !sheetUrl) ||
         (activeTab === "upload" && !file);
 

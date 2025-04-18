@@ -149,10 +149,22 @@ function AppLayout() {
         setIsLoadingSpreadsheet(false);
 
         if (success) {
-            console.log("Spreadsheet loaded successfully. Query:", query);
-            // Simulate analysis time if needed for isLoading state
-            setIsLoading(true);
-            setTimeout(() => setIsLoading(false), 1500); // Example delay
+            // Check if there is a query to process
+            if (query.trim() === "") {
+                console.log(
+                    "Spreadsheet loaded successfully. No query provided, displaying full sheet."
+                );
+                setIsLoading(false); // Ensure query loading indicator is off
+            } else {
+                console.log(
+                    "Spreadsheet loaded successfully. Processing query:",
+                    query
+                );
+                // Simulate analysis time if needed for isLoading state
+                setIsLoading(true);
+                // TODO: Replace setTimeout with actual query processing logic
+                setTimeout(() => setIsLoading(false), 1500); // Example delay for query processing
+            }
         } else {
             console.log("Failed to load or parse spreadsheet.");
             setIsLoading(false); // Ensure loading is false on failure
@@ -201,9 +213,9 @@ function AppLayout() {
                         </button>
                         {/* Apply class name for Nav Link */}
                         <a
-                            href="https://github.com/your-repo"
                             target="_blank"
                             rel="noopener noreferrer"
+                            href="https://github.com/IdeaFlowCo/QueryMySheet"
                             className="nav-link"
                         >
                             <svg // Placeholder SVG - Add relevant path
@@ -256,9 +268,9 @@ function AppLayout() {
                         QueryMySheet is an open-source project.{" "}
                         {/* Apply class name for Footer Link */}
                         <a
-                            href="https://github.com/your-repo"
                             target="_blank"
                             rel="noopener noreferrer"
+                            href="https://github.com/IdeaFlowCo/QueryMySheet"
                             className="footer-link"
                         >
                             <svg // Placeholder SVG - Add relevant path

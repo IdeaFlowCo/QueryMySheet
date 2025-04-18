@@ -26,10 +26,12 @@ const openaiClient: OAIClientType = apiKey
               chat: {
                   completions: {
                       create: async () => {
-                          console.error(
-                              "OpenAI client not initialized due to missing API key."
-                          );
-                          return { choices: [] };
+                          const errorMsg =
+                              "OpenAI client not initialized due to missing API key.";
+                          console.error(errorMsg);
+                          // Instead of resolving with empty choices, reject the promise.
+                          // This makes the failure explicit in the calling code.
+                          return Promise.reject(new Error(errorMsg));
                       },
                   },
               },
