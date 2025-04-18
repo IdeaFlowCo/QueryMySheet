@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import {
     useReactTable,
     getCoreRowModel,
@@ -11,7 +11,7 @@ import "./DataTable.css";
 
 const DataTable: React.FC = () => {
     const { headers, filteredRows, loading } = useData();
-    const tableContainerRef = React.useRef<HTMLDivElement>(null);
+    const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const columns = useMemo<ColumnDef<string[]>[]>(() => {
         return headers.map((header, index) => ({
@@ -34,6 +34,7 @@ const DataTable: React.FC = () => {
         count: rows.length,
         estimateSize: () => 40,
         getScrollElement: () => tableContainerRef.current,
+        measureElement: (element) => element.getBoundingClientRect().height,
         overscan: 5,
     });
 
@@ -73,6 +74,7 @@ const DataTable: React.FC = () => {
                             {headerGroup.headers.map((header) => (
                                 <th
                                     key={header.id}
+                                    style={{ width: header.getSize() }}
                                     className="table-header-cell"
                                 >
                                     {flexRender(
@@ -93,16 +95,21 @@ const DataTable: React.FC = () => {
                         return (
                             <tr
                                 key={row.id}
+                                data-index={virtualRow.index}
+                                ref={rowVirtualizer.measureElement}
                                 className={`table-row ${
                                     virtualRow.index % 2 ? "odd" : "even"
                                 }`}
                                 style={{
-                                    height: `${virtualRow.size}px`,
                                     transform: `translateY(${virtualRow.start}px)`,
                                 }}
                             >
                                 {row.getVisibleCells().map((cell) => (
-                                    <td key={cell.id} className="table-cell">
+                                    <td
+                                        key={cell.id}
+                                        style={{ width: cell.column.getSize() }}
+                                        className="table-cell"
+                                    >
                                         {flexRender(
                                             cell.column.columnDef.cell,
                                             cell.getContext()

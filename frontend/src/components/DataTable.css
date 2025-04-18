@@ -10,7 +10,7 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    /* table-layout: fixed; */ /* Removed fixed layout - was causing invalid CSS */
+    table-layout: fixed; /* Restore fixed layout for virtualization */
 }
 
 .table-header {
@@ -28,11 +28,10 @@
     text-align: left;
     font-weight: 600; /* Slightly bolder header */
     color: #495057;
-    /* overflow: hidden; */ /* Removed */
-    /* text-overflow: ellipsis; */ /* Removed */
     white-space: normal; /* Allow wrapping */
     border-right: 1px solid #dee2e6;
     vertical-align: top; /* Align wrapped header text nicely */
+    word-break: break-word; /* Break long words in header too */
 }
 
 .table-header-cell:last-child {
@@ -49,7 +48,7 @@
     left: 0;
     width: 100%;
     /* height and transform are set inline */
-    display: flex; /* Use flex for row cells */
+    /* display: flex; */ /* Removed flex from row */
 }
 
 .table-row.even {
@@ -64,11 +63,7 @@
     /* width is set inline */
     padding: 9px 12px; /* Adjusted padding */
     border-right: 1px solid #e9ecef; /* Lighter cell border */
-    /* overflow: hidden; */ /* Removed */
-    /* text-overflow: ellipsis; */ /* Removed */
     white-space: normal; /* Allow wrapping */
-    /* display: flex; */ /* Removed */
-    /* align-items: center; */ /* Removed */
     font-size: 0.9rem; /* Slightly smaller cell font */
     vertical-align: top; /* Align wrapped text nicely */
     word-break: break-word; /* Break long words */
