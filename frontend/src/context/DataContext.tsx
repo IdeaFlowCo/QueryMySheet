@@ -7,7 +7,11 @@ interface DataContextType {
     filteredRows: string[][];
     loading: boolean;
     setData: (headers: string[], rows: string[][]) => void;
-    runSearchQuery: (query: string) => Promise<void>;
+    runSearchQuery: (
+        query: string,
+        searchHeaders: string[],
+        searchRows: string[][]
+    ) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -30,14 +34,18 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setFilteredRows(newRows);
     };
 
-    const runSearchQuery = async (query: string) => {
+    const runSearchQuery = async (
+        query: string,
+        searchHeaders: string[],
+        searchRows: string[][]
+    ) => {
         setLoading(true);
         try {
             if (!query) {
-                setFilteredRows(rows);
+                setFilteredRows(searchRows);
                 return;
             }
-            const results = await runSearch(query, headers, rows);
+            const results = await runSearch(query, searchHeaders, searchRows);
             setFilteredRows(results);
         } catch (error) {
             console.error("Error during search:", error);

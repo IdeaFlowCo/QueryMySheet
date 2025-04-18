@@ -14,7 +14,7 @@ import { HelpCircle } from "lucide-react"; // Import the HelpCircle icon
 
 // Define the main layout and logic component
 function AppLayout() {
-    const { setData } = useData();
+    const { setData, runSearchQuery } = useData();
     const [activeTab, setActiveTab] = useState<"url" | "upload">("url");
     const [query, setQuery] = useState<string>("");
     const [sheetUrl, setSheetUrl] = useState<string>("");
@@ -43,7 +43,9 @@ function AppLayout() {
         setFileName(newFile ? newFile.name : null);
     };
 
-    const parseAndSetData = (dataToParse: string[][] | string) => {
+    const parseAndSetData = (
+        dataToParse: string[][] | string
+    ): { success: boolean; headers?: string[]; rows?: string[][] } => {
         try {
             let parsedData: string[][] | null = null;
             if (typeof dataToParse === "string") {
@@ -58,12 +60,12 @@ function AppLayout() {
 
             if (!parsedData || parsedData.length < 1) {
                 alert("Sheet appears to be empty or inaccessible.");
-                return false;
+                return { success: false };
             }
             const headers = parsedData[0];
             const rows = parsedData.slice(1);
             setData(headers, rows);
-            return true;
+            return { success: true, headers, rows };
         } catch (error) {
             console.error("Error parsing data:", error);
             alert(
@@ -71,7 +73,7 @@ function AppLayout() {
                     error instanceof Error ? error.message : String(error)
                 }`
             );
-            return false;
+            return { success: false };
         }
     };
 
@@ -88,8 +90,14 @@ function AppLayout() {
     const handleSubmit = async () => {
         setIsLoadingSpreadsheet(true);
         setData([], []);
-        let success = false;
-        setIsLoading(false); // Reset isLoading initially
+        let parsedResult: {
+            success: boolean;
+            headers?: string[];
+            rows?: string[][];
+        } = {
+            success: false,
+        };
+        setIsLoading(false);
 
         if (activeTab === "url") {
             if (
@@ -106,7 +114,7 @@ function AppLayout() {
                 if (!res.ok)
                     throw new Error(`Failed to fetch sheet: ${res.statusText}`);
                 const text = await res.text();
-                success = parseAndSetData(text);
+                parsedResult = parseAndSetData(text);
             } catch (error) {
                 console.error("Error fetching or parsing URL:", error);
                 alert(
@@ -120,11 +128,12 @@ function AppLayout() {
             try {
                 if (ext === "csv") {
                     const text = await file.text();
-                    success = parseAndSetData(text);
+                    parsedResult = parseAndSetData(text);
                 } else if (ext === "xls" || ext === "xlsx") {
                     const fileData = await file.arrayBuffer();
                     const workbook = XLSX.read(new Uint8Array(fileData), {
                         type: "array",
+                        raw: false,
                     });
                     const sheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[sheetName];
@@ -132,7 +141,7 @@ function AppLayout() {
                         header: 1,
                         raw: false,
                     });
-                    success = parseAndSetData(json);
+                    parsedResult = parseAndSetData(json);
                 } else {
                     alert("Unsupported file type.");
                 }
@@ -148,26 +157,32 @@ function AppLayout() {
 
         setIsLoadingSpreadsheet(false);
 
-        if (success) {
-            // Check if there is a query to process
+        if (parsedResult.success && parsedResult.headers && parsedResult.rows) {
             if (query.trim() === "") {
                 console.log(
                     "Spreadsheet loaded successfully. No query provided, displaying full sheet."
                 );
-                setIsLoading(false); // Ensure query loading indicator is off
+                setIsLoading(false);
             } else {
                 console.log(
                     "Spreadsheet loaded successfully. Processing query:",
                     query
                 );
-                // Simulate analysis time if needed for isLoading state
-                setIsLoading(true);
-                // TODO: Replace setTimeout with actual query processing logic
-                setTimeout(() => setIsLoading(false), 1500); // Example delay for query processing
+                // Wrap the search call in try...finally to ensure isLoading is reset
+                try {
+                    setIsLoading(true);
+                    await runSearchQuery(
+                        query,
+                        parsedResult.headers,
+                        parsedResult.rows
+                    );
+                } finally {
+                    setIsLoading(false);
+                }
             }
         } else {
             console.log("Failed to load or parse spreadsheet.");
-            setIsLoading(false); // Ensure loading is false on failure
+            setIsLoading(false);
         }
     };
 
