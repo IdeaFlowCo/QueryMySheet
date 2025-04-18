@@ -18,6 +18,7 @@ const DataTable: React.FC = () => {
             id: String(index),
             header: header,
             accessorFn: (row) => row[index],
+            size: 160,
         }));
     }, [headers]);
 
