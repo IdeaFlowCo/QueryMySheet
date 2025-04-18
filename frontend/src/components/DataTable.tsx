@@ -18,7 +18,6 @@ const DataTable: React.FC = () => {
             id: String(index),
             header: header,
             accessorFn: (row) => row[index],
-            size: 160,
         }));
     }, [headers]);
 
@@ -73,7 +72,6 @@ const DataTable: React.FC = () => {
                             {headerGroup.headers.map((header) => (
                                 <th
                                     key={header.id}
-                                    style={{ width: header.getSize() }}
                                     className="table-header-cell"
                                 >
                                     {flexRender(
@@ -103,11 +101,7 @@ const DataTable: React.FC = () => {
                                 }}
                             >
                                 {row.getVisibleCells().map((cell) => (
-                                    <td
-                                        key={cell.id}
-                                        style={{ width: cell.column.getSize() }}
-                                        className="table-cell"
-                                    >
+                                    <td key={cell.id} className="table-cell">
                                         {flexRender(
                                             cell.column.columnDef.cell,
                                             cell.getContext()
