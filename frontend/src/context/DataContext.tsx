@@ -49,7 +49,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             setFilteredRows(results);
         } catch (error) {
             console.error("Error during search:", error);
-            setFilteredRows([]);
+            setFilteredRows([]); // Keep reset on error
         } finally {
             setLoading(false);
         }

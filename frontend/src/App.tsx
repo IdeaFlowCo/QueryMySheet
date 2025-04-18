@@ -67,7 +67,6 @@ function AppLayout() {
             setData(headers, rows);
             return { success: true, headers, rows };
         } catch (error) {
-            console.error("Error parsing data:", error);
             alert(
                 `Failed to parse data. Error: ${
                     error instanceof Error ? error.message : String(error)
@@ -116,7 +115,6 @@ function AppLayout() {
                 const text = await res.text();
                 parsedResult = parseAndSetData(text);
             } catch (error) {
-                console.error("Error fetching or parsing URL:", error);
                 alert(
                     `Failed to load data from URL. Check permissions. Error: ${
                         error instanceof Error ? error.message : String(error)
@@ -146,7 +144,6 @@ function AppLayout() {
                     alert("Unsupported file type.");
                 }
             } catch (error) {
-                console.error("Error reading or parsing file:", error);
                 alert(
                     `Failed to process file. Error: ${
                         error instanceof Error ? error.message : String(error)
@@ -159,15 +156,8 @@ function AppLayout() {
 
         if (parsedResult.success && parsedResult.headers && parsedResult.rows) {
             if (query.trim() === "") {
-                console.log(
-                    "Spreadsheet loaded successfully. No query provided, displaying full sheet."
-                );
                 setIsLoading(false);
             } else {
-                console.log(
-                    "Spreadsheet loaded successfully. Processing query:",
-                    query
-                );
                 // Wrap the search call in try...finally to ensure isLoading is reset
                 try {
                     setIsLoading(true);
@@ -181,7 +171,6 @@ function AppLayout() {
                 }
             }
         } else {
-            console.log("Failed to load or parse spreadsheet.");
             setIsLoading(false);
         }
     };

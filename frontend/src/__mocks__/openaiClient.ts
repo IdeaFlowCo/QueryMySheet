@@ -1,73 +1,150 @@
 // __mocks__/openaiClient.ts
-import { jest } from "@jest/globals";
+import { ChatCompletion, ChatCompletionCreateParams } from "openai/resources";
+import { Stream } from "openai/streaming";
 
-// Revert to simpler mock using 'any'
-const mockCreate = jest.fn().mockImplementation(async (params: any) => {
-    const userMessage = params.messages.find((m: any) => m.role === "user");
-    const content = userMessage?.content || "";
+const mockCompletionsCreate = async (
+    params: ChatCompletionCreateParams
+): Promise<
+    ChatCompletion | Stream<ChatCompletion> // Assuming Stream might be needed someday
+> => {
+    const content = params.messages[0]?.content?.toString() || "";
 
-    if (content.includes("Query: find me events related to 'yoga'")) {
-        // Test case: 'yoga' -> rows 1, 2, 4, 5, 10
-        console.log("Mock: Detected 'yoga' query, returning [1, 2, 4, 5, 10]");
-        return Promise.resolve({
-            choices: [{ message: { content: "[1, 2, 4, 5, 10]" } }],
-        });
-    } else if (content.includes("Query: find me events related to 'music'")) {
-        // Test case: 'music' -> rows 3, 8
-        console.log("Mock: Detected 'music' query, returning [3, 8]");
-        return Promise.resolve({
-            choices: [{ message: { content: "[3, 8]" } }],
-        });
-    } else if (
-        content.includes("Query: find me events related to 'meditation'")
-    ) {
-        // Test case: 'meditation' -> rows 2, 6, 9
-        console.log("Mock: Detected 'meditation' query, returning [2, 6, 9]");
-        return Promise.resolve({
-            choices: [{ message: { content: "[2, 6, 9]" } }],
-        });
-    } else if (
-        content.includes("Query: find me events related to 'Beat Town Hall'")
-    ) {
-        // Test case: 'Beat Town Hall' -> rows 3, 8
-        console.log("Mock: Detected 'Beat Town Hall' query, returning [3, 8]");
-        return Promise.resolve({
-            choices: [{ message: { content: "[3, 8]" } }],
-        });
-    } else if (
-        content.includes("Query: find me events related to 'Central Park'")
-    ) {
-        // Test case: 'Central Park' -> rows 7, 10
-        console.log("Mock: Detected 'Central Park' query, returning [7, 10]");
-        return Promise.resolve({
-            choices: [{ message: { content: "[7, 10]" } }],
-        });
-    } else if (content.includes("Query: find me events related to 'foo'")) {
-        // Test case: 'foo' -> no rows
-        console.log("Mock: Detected 'foo' query, returning []");
-        return Promise.resolve({ choices: [{ message: { content: "[]" } }] });
-    } else {
-        // Default empty result for any other unrecognized queries in tests
-        console.log(
-            `Mock: Query not specifically handled, returning []: ${content.substring(
-                content.indexOf("Query:"),
-                content.indexOf("Output:")
-            )}`
-        );
-        return Promise.resolve({ choices: [{ message: { content: "[]" } }] });
+    // Simple mock logic based on query content
+    if (content.includes("yoga")) {
+        return {
+            id: "mock-yoga-123",
+            object: "chat.completion",
+            created: Date.now(),
+            model: params.model,
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: "assistant",
+                        content: JSON.stringify([1, 2, 4, 5, 10]),
+                    },
+                    finish_reason: "stop",
+                },
+            ],
+        } as ChatCompletion;
     }
-});
+    if (content.includes("music")) {
+        return {
+            id: "mock-music-123",
+            object: "chat.completion",
+            created: Date.now(),
+            model: params.model,
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: "assistant",
+                        content: JSON.stringify([3, 8]),
+                    },
+                    finish_reason: "stop",
+                },
+            ],
+        } as ChatCompletion;
+    }
+    if (content.includes("meditation")) {
+        return {
+            id: "mock-meditation-123",
+            object: "chat.completion",
+            created: Date.now(),
+            model: params.model,
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: "assistant",
+                        content: JSON.stringify([2, 6, 9]),
+                    },
+                    finish_reason: "stop",
+                },
+            ],
+        } as ChatCompletion;
+    }
+    if (content.includes("Beat Town Hall")) {
+        return {
+            id: "mock-beat-town-hall-123",
+            object: "chat.completion",
+            created: Date.now(),
+            model: params.model,
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: "assistant",
+                        content: JSON.stringify([3, 8]),
+                    },
+                    finish_reason: "stop",
+                },
+            ],
+        } as ChatCompletion;
+    }
+    if (content.includes("Central Park")) {
+        return {
+            id: "mock-central-park-123",
+            object: "chat.completion",
+            created: Date.now(),
+            model: params.model,
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: "assistant",
+                        content: JSON.stringify([7, 10]),
+                    },
+                    finish_reason: "stop",
+                },
+            ],
+        } as ChatCompletion;
+    }
+    if (content.includes("foo")) {
+        return {
+            id: "mock-foo-123",
+            object: "chat.completion",
+            created: Date.now(),
+            model: params.model,
+            choices: [
+                {
+                    index: 0,
+                    message: {
+                        role: "assistant",
+                        content: "[]", // Empty array for no match
+                    },
+                    finish_reason: "stop",
+                },
+            ],
+        } as ChatCompletion;
+    }
 
-const mockOpenAIClient = {
+    // Default mock response if no specific query matched
+    return {
+        id: "mock-default-123",
+        object: "chat.completion",
+        created: Date.now(),
+        model: params.model,
+        choices: [
+            {
+                index: 0,
+                message: {
+                    role: "assistant",
+                    content: "[]", // Default to empty array
+                },
+                finish_reason: "stop",
+            },
+        ],
+    } as ChatCompletion;
+};
+
+// Mock the entire OpenAI client structure needed by search.ts
+const mockOpenaiClient = {
     chat: {
         completions: {
-            create: mockCreate,
+            create: mockCompletionsCreate,
         },
-    },
-    // Utility to reset mock call history between tests
-    reset: () => {
-        mockCreate.mockClear();
     },
 };
 
-export default mockOpenAIClient;
+export default mockOpenaiClient;

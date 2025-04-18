@@ -105,7 +105,6 @@ describe("runSearch (Complex Integration)", () => {
         const result = await runSearch(query, complexHeaders, complexRows);
         expect(result).toBeInstanceOf(Array);
         expect(result.length).toBeLessThanOrEqual(1); // Should be 0 or maybe 1 hallucination
-        console.log(`Complex Test: Query='${query}', Results=${result.length}`);
     });
 
     it("should find work events on May 10th", async () => {
@@ -117,10 +116,6 @@ describe("runSearch (Complex Integration)", () => {
             expect(row[3]?.toLowerCase()).toBe("work"); // Check Category is Work
             expect(row[1]).toBe("2025-05-10"); // Check Date is 2025-05-10
         });
-        console.log(
-            `Complex Test: Query='${query}', Results=${result.length}`,
-            result
-        );
     });
 
     it("should find wellness activities", async () => {
@@ -131,10 +126,6 @@ describe("runSearch (Complex Integration)", () => {
         result.forEach((row) => {
             expect(row[3]?.toLowerCase()).toBe("wellness"); // Check Category is Wellness
         });
-        console.log(
-            `Complex Test: Query='${query}', Results=${result.length}`,
-            result
-        );
     });
 
     it("should find when the project deadline is", async () => {
@@ -148,10 +139,6 @@ describe("runSearch (Complex Integration)", () => {
                 row[0]?.toLowerCase().includes("project deadline")
             )
         ).toBe(true);
-        console.log(
-            `Complex Test: Query='${query}', Results=${result.length}`,
-            result
-        );
     });
 
     it("should find meetings after 1 PM on May 10th", async () => {
@@ -166,10 +153,6 @@ describe("runSearch (Complex Integration)", () => {
             const time = row[2];
             expect(time && parseInt(time.split(":")[0]) >= 2).toBe(true);
         });
-        console.log(
-            `Complex Test: Query='${query}', Results=${result.length}`,
-            result
-        );
     });
 
     it("should find events at Studio A", async () => {
@@ -180,9 +163,5 @@ describe("runSearch (Complex Integration)", () => {
         result.forEach((row) => {
             expect(row[4]).toBe("Studio A"); // Check Location
         });
-        console.log(
-            `Complex Test: Query='${query}', Results=${result.length}`,
-            result
-        );
     });
 });
