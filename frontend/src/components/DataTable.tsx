@@ -5,7 +5,6 @@ import {
     flexRender,
     ColumnDef,
 } from "@tanstack/react-table";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { useData } from "../context/DataContext";
 import "./DataTable.css";
 
@@ -14,12 +13,31 @@ const DataTable: React.FC = () => {
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const columns = useMemo<ColumnDef<string[]>[]>(() => {
-        return headers.map((header, index) => ({
-            id: String(index),
-            header: header,
-            accessorFn: (row) => row[index],
-            size: 160,
-        }));
+        return headers.map((header, index) => {
+            const lowerHeader = header.toLowerCase().trim();
+            let colSize = 150; // Default size for most columns
+
+            // Prioritize the problematic column with a larger fixed size
+            if (
+                lowerHeader === "annual co₂ emissions" ||
+                lowerHeader === "annual co2 emissions"
+            ) {
+                colSize = 280; // Generous size for this specific header
+            } else if (header.length > 20) {
+                colSize = 220; // For other long headers
+            } else if (header.length < 6 && headers.length > 3) {
+                colSize = 100; // Shorter headers if there are multiple columns
+            }
+
+            return {
+                id: String(index),
+                header: header,
+                accessorFn: (row) => row[index],
+                size: colSize,
+                minSize: 80, // Minimum width to maintain readability
+                maxSize: 400, // Maximum width to prevent overly wide columns
+            };
+        });
     }, [headers]);
 
     const table = useReactTable({
@@ -29,16 +47,6 @@ const DataTable: React.FC = () => {
     });
 
     const { rows } = table.getRowModel();
-
-    const rowVirtualizer = useVirtualizer({
-        count: rows.length,
-        estimateSize: () => 40,
-        getScrollElement: () => tableContainerRef.current,
-        measureElement: (element) => element.getBoundingClientRect().height,
-        overscan: 5,
-    });
-
-    const virtualRows = rowVirtualizer.getVirtualItems();
 
     if (loading) {
         return (
@@ -86,39 +94,26 @@ const DataTable: React.FC = () => {
                         </tr>
                     ))}
                 </thead>
-                <tbody
-                    className="table-body"
-                    style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
-                >
-                    {virtualRows.map((virtualRow) => {
-                        const row = rows[virtualRow.index];
-                        return (
-                            <tr
-                                key={row.id}
-                                data-index={virtualRow.index}
-                                ref={rowVirtualizer.measureElement}
-                                className={`table-row ${
-                                    virtualRow.index % 2 ? "odd" : "even"
-                                }`}
-                                style={{
-                                    transform: `translateY(${virtualRow.start}px)`,
-                                }}
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <td
-                                        key={cell.id}
-                                        style={{ width: cell.column.getSize() }}
-                                        className="table-cell"
-                                    >
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext()
-                                        )}
-                                    </td>
-                                ))}
-                            </tr>
-                        );
-                    })}
+                <tbody className="table-body">
+                    {rows.map((row, idx) => (
+                        <tr
+                            key={row.id}
+                            className={`table-row ${idx % 2 ? "odd" : "even"}`}
+                        >
+                            {row.getVisibleCells().map((cell) => (
+                                <td
+                                    key={cell.id}
+                                    className="table-cell"
+                                    style={{ width: cell.column.getSize() }}
+                                >
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
+                                    )}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>

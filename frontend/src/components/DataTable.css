@@ -8,9 +8,9 @@
 }
 
 .data-table {
-    width: 100%;
+    width: 100%; /* Stretch table to fill container width */
     border-collapse: collapse;
-    table-layout: fixed; /* Restore fixed layout for virtualization */
+    table-layout: fixed; /* Fixed layout ensures header and body share the same column grid */
 }
 
 .table-header {
@@ -39,16 +39,11 @@
 }
 
 .table-body {
-    position: relative; /* Needed for absolute positioned rows */
+    /* Normal static positioning */
 }
 
 .table-row {
-    position: absolute; /* Needed for virtualization */
-    top: 0;
-    left: 0;
-    width: 100%;
-    /* height and transform are set inline */
-    /* display: flex; */ /* Removed flex from row */
+    /* Static row positioning now */
 }
 
 .table-row.even {
