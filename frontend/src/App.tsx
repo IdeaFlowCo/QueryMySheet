@@ -107,7 +107,26 @@ function AppLayout() {
                 setIsLoadingSpreadsheet(false);
                 return;
             }
-            const csvUrl = sheetUrl.replace(/\/edit.*$/, "/export?format=csv");
+            // Extract gid from sheetUrl
+            let gid = null;
+            try {
+                const url = new URL(sheetUrl);
+                const params = new URLSearchParams(url.hash.substring(1)); // Prefer hash for gid
+                gid = params.get("gid");
+                if (!gid && url.search) {
+                    // Fallback to search params if not in hash
+                    const searchParams = new URLSearchParams(url.search);
+                    gid = searchParams.get("gid");
+                }
+            } catch (e) {
+                //Silently ignore an invalid URL, the replace will handle it or error later
+                console.warn("Could not parse GID from URL", e);
+            }
+
+            let csvUrl = sheetUrl.replace(/\/edit.*$/, "/export?format=csv");
+            if (gid) {
+                csvUrl += `&gid=${gid}`;
+            }
             try {
                 const res = await fetch(csvUrl);
                 if (!res.ok)
